@@ -21,7 +21,7 @@ namespace HellBrick.NoCapture.Analyzer.Test
 			(
 				diags
 				=> diags.Should().HaveCount( 1 )
-				.And.Subject.First().GetMessage().Should().Be( $"{methodName}( {parameterName} ) doesn't allow capturing lambdas. Captured variables: {String.Join( ",", capturedVariables )}." )
+				.And.Subject.First().GetMessage().Should().Be( $"{methodName}( {parameterName} ) requires a non-capturing lambda. Captured variables: {String.Join( ",", capturedVariables )}." )
 			);
 	}
 

@@ -92,5 +92,29 @@ class C
 "
 			)
 			.ShouldHaveDiagnostic( "Invoke", "func", "this" );
+
+		[Fact]
+		public void CorrectParameterNameIsReportedIfNamedArgumentsHaveIncorrectOrder()
+			=> _verifier
+			.Source
+			(
+@"
+using System;
+
+[AttributeUsage( AttributeTargets.Parameter | AttributeTargets.Method )]
+class NoCaptureAttribute : Attribute
+{
+}
+
+class C
+{
+	private readonly int _field = 42;
+
+	void CallSite() => Invoke( func: s => s + _field, seed: 64 );
+	[NoCapture] T Invoke<T>( int seed, Func<int, T> func ) => func( seed );
+}
+"
+			)
+			.ShouldHaveDiagnostic( "Invoke", "func", "this" );
 	}
 }

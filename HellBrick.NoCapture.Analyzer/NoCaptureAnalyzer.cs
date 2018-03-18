@@ -78,7 +78,11 @@ namespace HellBrick.NoCapture.Analyzer
 				)
 				{
 					method = methodSymbol;
-					parameter = methodSymbol.Parameters[ argumentList.Arguments.IndexOf( argument ) ];
+					parameter
+						= argument.NameColon is NameColonSyntax nameColon
+						? methodSymbol.Parameters.First( p => p.Name == nameColon.Name.Identifier.Text )
+						: methodSymbol.Parameters[ argumentList.Arguments.IndexOf( argument ) ];
+
 					return true;
 				}
 				else

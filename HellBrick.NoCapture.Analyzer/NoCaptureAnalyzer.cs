@@ -43,7 +43,7 @@ namespace HellBrick.NoCapture.Analyzer
 			{
 				if ( TryGetSymbols( nodeContext.Node, nodeContext.SemanticModel, out IMethodSymbol methodSymbol, out IParameterSymbol parameterSymbol ) )
 				{
-					if ( HasNoCaptureAttribute( methodSymbol ) )
+					if ( HasNoCaptureAttribute( methodSymbol ) || HasNoCaptureAttribute( parameterSymbol ) )
 					{
 						DataFlowAnalysis dataFlow = nodeContext.SemanticModel.AnalyzeDataFlow( nodeContext.Node );
 						if ( !dataFlow.Captured.IsEmpty )

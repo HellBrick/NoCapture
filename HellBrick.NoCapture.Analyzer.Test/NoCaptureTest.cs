@@ -141,5 +141,29 @@ class C
 "
 			)
 			.ShouldHaveDiagnostic( "Invoke", "func", "this" );
+
+		[Fact]
+		public void CapturingArgumentPassedAsNoCaptureParameterIsReported()
+			=> _verifier
+			.Source
+			(
+@"
+using System;
+
+[AttributeUsage( AttributeTargets.Parameter | AttributeTargets.Method )]
+class NoCaptureAttribute : Attribute
+{
+}
+
+class C
+{
+	private readonly int _field = 42;
+
+	void CallSite() => Invoke( () => _field, () => _field + 2 );
+	T Invoke<T>( Func<T> normalFunc, [NoCapture] Func<T> noCaptureFunc ) => normalFunc() + noCaptureFunc();
+}
+"
+			)
+			.ShouldHaveDiagnostic( "Invoke", "noCaptureFunc", "this" );
 	}
 }

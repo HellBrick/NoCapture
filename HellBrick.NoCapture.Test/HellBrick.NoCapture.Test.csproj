@@ -11,6 +11,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\HellBrick.Diagnostics.Assertions\HellBrick.Diagnostics.Assertions.csproj" />
-    <ProjectReference Include="..\HellBrick.NoCapture.Analyzer\HellBrick.NoCapture.Analyzer.csproj" />
+    <ProjectReference Include="..\HellBrick.NoCapture\HellBrick.NoCapture.csproj" />
   </ItemGroup>
 </Project>

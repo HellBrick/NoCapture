@@ -2,27 +2,24 @@
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
     <PackageTargetFallback>portable-net45+win8+wp8+wpa81</PackageTargetFallback>
-    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <IncludeBuildOutput>True</IncludeBuildOutput>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageId>HellBrick.NoCapture.Analyzer</PackageId>
-    <PackageVersion>1.0.0.0</PackageVersion>
+    <PackageId>HellBrick.NoCapture</PackageId>
+    <PackageVersion>1.0.0</PackageVersion>
     <Authors>HellBrick</Authors>
     <PackageProjectUrl>https://github.com/HellBrick/NoCapture</PackageProjectUrl>
     <RepositoryUrl>https://github.com/HellBrick/NoCapture</RepositoryUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <Description>Roslyn analyzer that emits errors when capturing lambdas are being passed as arguments to [NoCapture] methods.</Description>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="HellBrick.Diagnostics" Version="3.0.1" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="2.6.1" PrivateAssets="all" />
     <PackageReference Update="NETStandard.Library" PrivateAssets="all" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\HellBrick.NoCapture.Attribute\HellBrick.NoCapture.Attribute.csproj" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>

@@ -74,7 +74,7 @@ namespace HellBrick.NoCapture.Analyzer
 					node.Parent is ArgumentSyntax argument
 					&& argument.Parent is ArgumentListSyntax argumentList
 					&& argumentList.Parent is InvocationExpressionSyntax invocation
-					&& semanticModel.GetSymbolInfo( invocation.Expression ).Symbol is IMethodSymbol methodSymbol
+					&& semanticModel.GetSingleSymbol( invocation.Expression ) is IMethodSymbol methodSymbol
 				)
 				{
 					method = methodSymbol;

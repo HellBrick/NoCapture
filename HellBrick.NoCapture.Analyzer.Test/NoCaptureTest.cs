@@ -116,5 +116,30 @@ class C
 "
 			)
 			.ShouldHaveDiagnostic( "Invoke", "func", "this" );
+
+		[Fact]
+		public void SlightlyIncorrectCapturingInvocationOfNoCaptureMethodIsReported()
+			=> _verifier
+			.Source
+			(
+@"
+using System;
+
+[AttributeUsage( AttributeTargets.Parameter | AttributeTargets.Method )]
+class NoCaptureAttribute : Attribute
+{
+}
+
+class C
+{
+	private readonly int _field = 42;
+
+	// Lambda doesn't follow the correct signature, but the invoked method still can be determined as non-capturing.
+	void CallSite() => Invoke( 64, () => _field );
+	[NoCapture] T Invoke<T>( seed, Func<int, T> func ) => func( seed );
+}
+"
+			)
+			.ShouldHaveDiagnostic( "Invoke", "func", "this" );
 	}
 }

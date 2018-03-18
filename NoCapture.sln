@@ -7,9 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HellBrick.NoCapture.Attribu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HellBrick.Diagnostics.Assertions", "HellBrick.Diagnostics.Assertions\HellBrick.Diagnostics.Assertions.csproj", "{A0CA8775-6BA4-48E6-B57F-0FA8CDEC30F4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HellBrick.NoCapture.Analyzer", "HellBrick.NoCapture.Analyzer\HellBrick.NoCapture.Analyzer.csproj", "{F2FA02B9-9342-4818-A703-3F5330CBC85D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HellBrick.NoCapture", "HellBrick.NoCapture\HellBrick.NoCapture.csproj", "{F2FA02B9-9342-4818-A703-3F5330CBC85D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HellBrick.NoCapture.Analyzer.Test", "HellBrick.NoCapture.Analyzer.Test\HellBrick.NoCapture.Analyzer.Test.csproj", "{93BDF930-E779-4E7C-8E97-FA25177F428B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HellBrick.NoCapture.Test", "HellBrick.NoCapture.Test\HellBrick.NoCapture.Test.csproj", "{93BDF930-E779-4E7C-8E97-FA25177F428B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

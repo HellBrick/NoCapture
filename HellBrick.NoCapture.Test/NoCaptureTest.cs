@@ -165,5 +165,80 @@ class C
 "
 			)
 			.ShouldHaveDiagnostic( "Invoke", "noCaptureFunc", "this" );
+
+		[Fact]
+		public void CapturingArgumentPassedAsNoCaptureParameterInsideLocalMethodIsReported()
+			=> _verifier
+			.Source
+			(
+@"
+using System;
+
+[AttributeUsage( AttributeTargets.Parameter | AttributeTargets.Method )]
+class NoCaptureAttribute : Attribute
+{
+}
+
+class C
+{
+	private readonly int? _field = 64;
+
+	int CallSite( int outerArg )
+	{
+		return
+			field is int notNullField
+			? notNullField.Select( x => x + outerArg )
+			: 42;
+	}
+}
+
+static class X
+{
+	public static T Select<T>( this T value, [NoCapture] Func<T, T> selector ) => selector( value );
+}
+"
+			)
+			.ShouldHaveDiagnostic( "Select", "selector", "outerArg" );
+
+		[Fact]
+		public void NoFalsePositiveForNonCapturingLambdaInsideLocalMethod()
+			=> _verifier
+			.Source
+			(
+@"
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+[AttributeUsage( AttributeTargets.Parameter | AttributeTargets.Method )]
+class NoCaptureAttribute : Attribute
+{
+}
+
+class C
+{
+	private readonly int[] _numbers = { 42, 64, 128 };
+
+	public IEnumerable<int> EnumerateNumbers()
+	{
+		return
+			_numbers == null
+			? Enumerable.Empty<int>()
+			: EnumerateWithoutValidation();
+
+		IEnumerable<int> EnumerateWithoutValidation()
+			=> _numbers
+			.WhereNoCapture( x => x == 42 );
+	}
+}
+
+static class X
+{
+		public static IEnumerable<T> WhereNoCapture<T>( this IEnumerable<T> sequence, [NoCapture] Func<T, bool> predicate )
+			=> sequence.Where( predicate );
+}
+"
+			)
+			.ShouldHaveNoDiagnostics();
 	}
 }

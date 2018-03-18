@@ -19,7 +19,7 @@ namespace HellBrick.NoCapture.Analyzer
 			(
 				DiagnosticId,
 				"Capturing is not allowed",
-				"{0}( {1} ) doesn't allow capturing lambdas. Captured variables: {2}.",
+				"{0}( {1} ) requires a non-capturing lambda. Captured variables: {2}.",
 				"Performance",
 				DiagnosticSeverity.Error,
 				isEnabledByDefault: true

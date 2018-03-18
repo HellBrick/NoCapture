@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageId>HellBrick.NoCapture.Analyzer</PackageId>
+    <PackageId>HellBrick.NoCapture</PackageId>
     <PackageVersion>1.0.0</PackageVersion>
     <Authors>HellBrick</Authors>
     <PackageProjectUrl>https://github.com/HellBrick/NoCapture</PackageProjectUrl>

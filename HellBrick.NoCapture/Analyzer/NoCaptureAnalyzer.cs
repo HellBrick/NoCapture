@@ -81,10 +81,14 @@ namespace HellBrick.NoCapture.Analyzer
 					method = methodSymbol;
 					parameter
 						= argument.NameColon is NameColonSyntax nameColon
-						? methodSymbol.Parameters.First( p => p.Name == nameColon.Name.Identifier.Text )
-						: methodSymbol.Parameters[ argumentList.Arguments.IndexOf( argument ) ];
+						? GetParameterByName()
+						: GetParameterByOrder();
 
 					return true;
+
+					IParameterSymbol GetParameterByName() => methodSymbol.Parameters.First( p => p.Name == nameColon.Name.Identifier.Text );
+
+					IParameterSymbol GetParameterByOrder() => methodSymbol.Parameters[ argumentList.Arguments.IndexOf( argument ) ];
 				}
 				else
 				{

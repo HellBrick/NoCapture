@@ -81,10 +81,22 @@ namespace HellBrick.NoCapture.Analyzer
 					method = methodSymbol;
 					parameter
 						= argument.NameColon is NameColonSyntax nameColon
-						? methodSymbol.Parameters.First( p => p.Name == nameColon.Name.Identifier.Text )
-						: methodSymbol.Parameters[ argumentList.Arguments.IndexOf( argument ) ];
+						? GetParameterByName()
+						: GetParameterByOrder();
 
 					return true;
+
+					IParameterSymbol GetParameterByName() => methodSymbol.Parameters.First( p => p.Name == nameColon.Name.Identifier.Text );
+
+					IParameterSymbol GetParameterByOrder()
+					{
+						int argumentIndex = argumentList.Arguments.IndexOf( argument );
+
+						/// params[] method invocations might have more arguments than parameters.
+						/// If they do, all extra arguments are actually passed to the last parameter.
+						int parameterIndex = argumentIndex < methodSymbol.Parameters.Length ? argumentIndex : methodSymbol.Parameters.Length - 1;
+						return methodSymbol.Parameters[ parameterIndex ];
+					}
 				}
 				else
 				{

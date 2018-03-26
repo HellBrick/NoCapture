@@ -90,7 +90,8 @@ namespace HellBrick.NoCapture.Analyzer
 
 					IParameterSymbol GetParameterByOrder()
 					{
-						return methodSymbol.Parameters[ argumentList.Arguments.IndexOf( argument ) ];
+						int argumentIndex = argumentList.Arguments.IndexOf( argument );
+						return methodSymbol.Parameters[ argumentIndex ];
 					}
 				}
 				else

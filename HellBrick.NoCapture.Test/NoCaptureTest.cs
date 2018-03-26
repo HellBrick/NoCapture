@@ -240,5 +240,53 @@ static class X
 "
 			)
 			.ShouldHaveNoDiagnostics();
+
+		[Fact]
+		public void CapturingArgumentPassedAsParamsItemWithoutNoCaptureIsIgnored()
+			=> _verifier
+			.Source
+			(
+@"
+using System;
+
+[AttributeUsage( AttributeTargets.Parameter | AttributeTargets.Method )]
+class NoCaptureAttribute : Attribute
+{
+}
+
+class C
+{
+	private readonly int _field = 42;
+
+	void CallSite() => Invoke( 64, x => x + 2, x => _field + x );
+	T Invoke<T>( T initialValue, params Func<T, T>[] transforms ) => initialValue;
+}
+"
+			)
+			.ShouldHaveNoDiagnostics();
+
+		[Fact]
+		public void CapturingArgumentPassedAsNoCaptureParamsItemIsReported()
+			=> _verifier
+			.Source
+			(
+@"
+using System;
+
+[AttributeUsage( AttributeTargets.Parameter | AttributeTargets.Method )]
+class NoCaptureAttribute : Attribute
+{
+}
+
+class C
+{
+	private readonly int _field = 42;
+
+	void CallSite() => Invoke( 64, x => x + 2, x => _field + x );
+	T Invoke<T>( T initialValue, [NoCapture] params Func<T, T>[] transforms ) => initialValue;
+}
+"
+			)
+			.ShouldHaveDiagnostic( "Invoke", "transforms", "this" );
 	}
 }

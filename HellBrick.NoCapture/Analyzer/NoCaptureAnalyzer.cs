@@ -70,6 +70,10 @@ namespace HellBrick.NoCapture.Analyzer
 					{
 						DataFlowAnalysis dataFlow = nodeContext.SemanticModel.AnalyzeDataFlow( nodeContext.Node );
 						ImmutableArray<ISymbol> capturedSymbols = dataFlow.Captured.IntersectWith( dataFlow.ReadInside );
+
+						if ( capturedSymbols.IsEmpty )
+							return Enumerable.Empty<ISymbol>();
+
 						return capturedSymbols;
 					}
 				}

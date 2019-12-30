@@ -45,8 +45,7 @@ namespace HellBrick.NoCapture.Analyzer
 				{
 					if ( HasNoCaptureAttribute( methodSymbol ) || HasNoCaptureAttribute( parameterSymbol ) )
 					{
-						DataFlowAnalysis dataFlow = nodeContext.SemanticModel.AnalyzeDataFlow( nodeContext.Node );
-						ImmutableArray<ISymbol> capturedSymbols = dataFlow.Captured.IntersectWith( dataFlow.ReadInside );
+						ImmutableArray<ISymbol> capturedSymbols = GetCapturedSymbols();
 						if ( !capturedSymbols.IsEmpty )
 						{
 							Diagnostic diagnostic
@@ -65,6 +64,13 @@ namespace HellBrick.NoCapture.Analyzer
 
 					bool HasNoCaptureAttribute( ISymbol symbol )
 						=> symbol.GetAttributes().Any( a => a.AttributeClass.Name == _noCaptureAttributeName );
+
+					ImmutableArray<ISymbol> GetCapturedSymbols()
+					{
+						DataFlowAnalysis dataFlow = nodeContext.SemanticModel.AnalyzeDataFlow( nodeContext.Node );
+						ImmutableArray<ISymbol> capturedSymbols = dataFlow.Captured.IntersectWith( dataFlow.ReadInside );
+						return capturedSymbols;
+					}
 				}
 			}
 

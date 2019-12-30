@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
@@ -45,8 +46,8 @@ namespace HellBrick.NoCapture.Analyzer
 				{
 					if ( HasNoCaptureAttribute( methodSymbol ) || HasNoCaptureAttribute( parameterSymbol ) )
 					{
-						ImmutableArray<ISymbol> capturedSymbols = GetCapturedSymbols();
-						if ( !capturedSymbols.IsEmpty )
+						IEnumerable<ISymbol> capturedSymbols = GetCapturedSymbols();
+						if ( capturedSymbols.Any() )
 						{
 							Diagnostic diagnostic
 								= Diagnostic.Create
@@ -65,7 +66,7 @@ namespace HellBrick.NoCapture.Analyzer
 					bool HasNoCaptureAttribute( ISymbol symbol )
 						=> symbol.GetAttributes().Any( a => a.AttributeClass.Name == _noCaptureAttributeName );
 
-					ImmutableArray<ISymbol> GetCapturedSymbols()
+					IEnumerable<ISymbol> GetCapturedSymbols()
 					{
 						DataFlowAnalysis dataFlow = nodeContext.SemanticModel.AnalyzeDataFlow( nodeContext.Node );
 						ImmutableArray<ISymbol> capturedSymbols = dataFlow.Captured.IntersectWith( dataFlow.ReadInside );

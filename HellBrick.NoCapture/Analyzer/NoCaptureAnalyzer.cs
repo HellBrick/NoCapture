@@ -74,7 +74,20 @@ namespace HellBrick.NoCapture.Analyzer
 						if ( capturedSymbols.IsEmpty )
 							return Enumerable.Empty<ISymbol>();
 
-						return capturedSymbols;
+						IEnumerable<ISymbol> childDeclared = nodeContext
+							.Node
+							.DescendantNodesAndSelf( descendIntoChildren: _ => true, descendIntoTrivia: false )
+							.Where( child => _targetNodeTypes.Contains( child.Kind() ) )
+							.Select( child => nodeContext.SemanticModel.AnalyzeDataFlow( child ) )
+							.Where( dataFlow => dataFlow.Succeeded )
+							.Select( dataFlow => dataFlow.VariablesDeclared )
+							.Where( declared => declared.Length > 0 )
+							.SelectMany( x => x )
+						;
+
+						return capturedSymbols
+							.Except( childDeclared )
+						;
 					}
 				}
 			}

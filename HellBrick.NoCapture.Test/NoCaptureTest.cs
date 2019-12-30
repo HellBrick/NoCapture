@@ -288,5 +288,194 @@ class C
 "
 			)
 			.ShouldHaveDiagnostic( "Invoke", "transforms", "this" );
+
+		[Fact]
+		public void NonCapturingArgumentPassedAsNoCaptureButContainingNestedCapturingLambdaIsIgnored()
+			=> _verifier
+			.Source
+			(
+@"
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+
+[AttributeUsage( AttributeTargets.Parameter | AttributeTargets.Method )]
+class NoCaptureAttribute : Attribute
+{
+}
+
+class C
+{
+	public void CallSite() => Invoke( ( list, v ) => list.Select( x => x + v ) );
+	public void Invoke( [NoCapture] Expression<Func<List<int>, int, IEnumerable<int>>> f ) { }
+}
+"
+			)
+			.ShouldHaveNoDiagnostics();
+
+		[Fact]
+		public void CapturingArgumentPassedAsNoCaptureButContainingNestedCapturingLambdaIsReported()
+			=> _verifier
+			.Source
+			(
+@"
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+
+[AttributeUsage( AttributeTargets.Parameter | AttributeTargets.Method )]
+class NoCaptureAttribute : Attribute
+{
+}
+
+class C
+{
+	private readonly int _x = 42;
+	public void CallSite() => Invoke( ( list, v ) => list.Aggregate( _x, ( agg, x ) => agg + x + v ) );
+	public void Invoke( [NoCapture] Expression<Func<List<int>, int, int>> f ) { }
+}
+"
+			)
+			.ShouldHaveDiagnostic( "Invoke", "f", "this" );
+
+		[Fact]
+		public void CapturingArgumentPassedAsNoCaptureButContainingNestedCapturingLambdaWhichCapturesTheSameThingCapturedInItsParentIsReported()
+			=> _verifier
+			.Source
+			(
+@"
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+
+[AttributeUsage( AttributeTargets.Parameter | AttributeTargets.Method )]
+class NoCaptureAttribute : Attribute
+{
+}
+
+class C
+{
+	private readonly int _x = 42;
+	public void CallSite() => Invoke( ( list, v ) => list.Aggregate( _x, ( agg, x ) => _x + agg + x + v ) );
+	public void Invoke( [NoCapture] Expression<Func<List<int>, int, int>> f ) { }
+}
+"
+			)
+			.ShouldHaveDiagnostic( "Invoke", "f", "this" );
+
+		[Fact]
+		public void NestedCapturingFromTheOuterArgumentIsIgnored()
+			=> _verifier
+			.Source
+			(
+@"
+using System;
+using System.Collections.Generic;
+
+static class InvokeExtension
+{
+	public static int Invoke( this List<int> list, Func<int, int> inner ) => inner( 42 );
+}
+
+class C
+{
+	private readonly int _x = 42;
+	public void CallSite() => InvokeOuter( ( list, v ) => list.Invoke( _ => v ) );
+	public void InvokeOuter( Func<List<int>, int, int> outer ) { }
+}
+"
+			)
+			.ShouldHaveNoDiagnostics();
+
+		[Fact]
+		public void NestedCapturingFromTheOuterArgumentPassedAsNoCaptureIsReported()
+			=> _verifier
+			.Source
+			(
+@"
+using System;
+using System.Collections.Generic;
+
+[AttributeUsage( AttributeTargets.Parameter | AttributeTargets.Method )]
+class NoCaptureAttribute : Attribute
+{
+}
+
+static class InvokeExtension
+{
+	public static int Invoke( this List<int> list, [NoCapture] Func<int, int> inner ) => inner( 42 );
+}
+
+class C
+{
+	private readonly int _x = 42;
+	public void CallSite() => InvokeOuter( ( list, v ) => list.Invoke( _ => v ) );
+	public void InvokeOuter( Func<List<int>, int, int> outer ) { }
+}
+"
+			)
+			.ShouldHaveDiagnostic( "Invoke", "inner", "v" );
+
+		[Fact]
+		public void NestedCapturingFromTheOutsideWorldArgumentPassedAsNoCaptureIsReported()
+			=> _verifier
+			.Source
+			(
+@"
+using System;
+using System.Collections.Generic;
+
+[AttributeUsage( AttributeTargets.Parameter | AttributeTargets.Method )]
+class NoCaptureAttribute : Attribute
+{
+}
+
+static class InvokeExtension
+{
+	public static int Invoke( this List<int> list, [NoCapture] Func<int, int> inner ) => inner( 42 );
+}
+
+class C
+{
+	private readonly int _x = 42;
+	public void CallSite() => InvokeOuter( ( list, v ) => list.Invoke( _ => _x ) );
+	public void InvokeOuter( Func<List<int>, int, int> outer ) { }
+}
+"
+			)
+			.ShouldHaveDiagnostic( "Invoke", "inner", "this" );
+
+		[Fact]
+		public void ArgumentPassedAsNoCaptureContainingArgumentCapturingFromTheOutsideWorldArgumentIsReported()
+			=> _verifier
+			.Source
+			(
+@"
+using System;
+using System.Collections.Generic;
+
+[AttributeUsage( AttributeTargets.Parameter | AttributeTargets.Method )]
+class NoCaptureAttribute : Attribute
+{
+}
+
+static class InvokeExtension
+{
+	public static int Invoke( this List<int> list, Func<int, int> inner ) => inner( 42 );
+}
+
+class C
+{
+	private readonly int _x = 42;
+	public void CallSite() => InvokeOuter( ( list, v ) => list.Invoke( _ => _x ) );
+	public void InvokeOuter( [NoCapture] Func<List<int>, int, int> outer ) { }
+}
+"
+			)
+			// outer is to be reported because closure for the inner one is created from closure for the outer one
+			.ShouldHaveDiagnostic( "InvokeOuter", "outer", "this" );
 	}
 }

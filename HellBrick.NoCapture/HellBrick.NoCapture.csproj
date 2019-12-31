@@ -14,6 +14,7 @@
     <RepositoryUrl>https://github.com/HellBrick/NoCapture</RepositoryUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <Description>Roslyn analyzer that emits errors when capturing lambdas are being passed as arguments to [NoCapture] methods.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>

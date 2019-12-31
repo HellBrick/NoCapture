@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
@@ -45,9 +46,8 @@ namespace HellBrick.NoCapture.Analyzer
 				{
 					if ( HasNoCaptureAttribute( methodSymbol ) || HasNoCaptureAttribute( parameterSymbol ) )
 					{
-						DataFlowAnalysis dataFlow = nodeContext.SemanticModel.AnalyzeDataFlow( nodeContext.Node );
-						ImmutableArray<ISymbol> capturedSymbols = dataFlow.Captured.IntersectWith( dataFlow.ReadInside );
-						if ( !capturedSymbols.IsEmpty )
+						IEnumerable<ISymbol> capturedSymbols = GetCapturedSymbols();
+						if ( capturedSymbols.Any() )
 						{
 							Diagnostic diagnostic
 								= Diagnostic.Create
@@ -65,6 +65,30 @@ namespace HellBrick.NoCapture.Analyzer
 
 					bool HasNoCaptureAttribute( ISymbol symbol )
 						=> symbol.GetAttributes().Any( a => a.AttributeClass.Name == _noCaptureAttributeName );
+
+					IEnumerable<ISymbol> GetCapturedSymbols()
+					{
+						DataFlowAnalysis dataFlow = nodeContext.SemanticModel.AnalyzeDataFlow( nodeContext.Node );
+						ImmutableArray<ISymbol> capturedSymbols = dataFlow.Captured.IntersectWith( dataFlow.ReadInside );
+
+						if ( capturedSymbols.IsEmpty )
+							return Enumerable.Empty<ISymbol>();
+
+						IEnumerable<ISymbol> childDeclared = nodeContext
+							.Node
+							.DescendantNodesAndSelf( descendIntoChildren: _ => true, descendIntoTrivia: false )
+							.Where( child => _targetNodeTypes.Contains( child.Kind() ) )
+							.Select( child => nodeContext.SemanticModel.AnalyzeDataFlow( child ) )
+							.Where( dataFlow => dataFlow.Succeeded )
+							.Select( dataFlow => dataFlow.VariablesDeclared )
+							.Where( declared => declared.Length > 0 )
+							.SelectMany( x => x )
+						;
+
+						return capturedSymbols
+							.Except( childDeclared )
+						;
+					}
 				}
 			}
 
